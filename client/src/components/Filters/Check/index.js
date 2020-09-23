@@ -13,7 +13,6 @@ const Check = (props) => {
     const {
         pristine,
         invalid,
-        processing,
         handleSubmit,
     } = props;
 
@@ -23,6 +22,7 @@ const Check = (props) => {
         filters,
         whitelistFilters,
         check,
+        processingCheck,
     } = useSelector((state) => state.filtering, shallowEqual);
 
     const {
@@ -57,7 +57,7 @@ const Check = (props) => {
                                     className="btn btn-success btn-standard btn-large"
                                     type="submit"
                                     onClick={handleSubmit}
-                                    disabled={pristine || invalid || processing}
+                                    disabled={pristine || invalid || processingCheck}
                                 >
                                     {t('check')}
                                 </button>
@@ -90,7 +90,6 @@ Check.propTypes = {
     handleSubmit: PropTypes.func.isRequired,
     pristine: PropTypes.bool.isRequired,
     invalid: PropTypes.bool.isRequired,
-    processing: PropTypes.bool.isRequired,
 };
 
 export default reduxForm({ form: FORM_NAME.DOMAIN_CHECK })(Check);
