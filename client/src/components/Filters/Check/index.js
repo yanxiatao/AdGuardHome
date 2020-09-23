@@ -1,8 +1,8 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { Trans, withTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Field, reduxForm } from 'redux-form';
-import flow from 'lodash/flow';
+import { shallowEqual, useSelector } from 'react-redux';
 import Card from '../../ui/Card';
 
 import { renderInputField } from '../../../helpers/form';
@@ -11,15 +11,19 @@ import { FORM_NAME } from '../../../helpers/constants';
 
 const Check = (props) => {
     const {
-        t,
-        handleSubmit,
         pristine,
         invalid,
         processing,
-        check,
+        handleSubmit,
+    } = props;
+
+    const { t } = useTranslation();
+
+    const {
         filters,
         whitelistFilters,
-    } = props;
+        check,
+    } = useSelector((state) => state.filtering, shallowEqual);
 
     const {
         hostname,
@@ -55,12 +59,12 @@ const Check = (props) => {
                                     onClick={handleSubmit}
                                     disabled={pristine || invalid || processing}
                                 >
-                                    <Trans>check</Trans>
+                                    {t('check')}
                                 </button>
                             </span>
                         </div>
                         {check.hostname && (
-                            <Fragment>
+                            <>
                                 <hr />
                                 <Info
                                     filters={filters}
@@ -73,7 +77,7 @@ const Check = (props) => {
                                     cname={cname}
                                     ip_addrs={ip_addrs}
                                 />
-                            </Fragment>
+                            </>
                         )}
                     </div>
                 </div>
@@ -83,17 +87,10 @@ const Check = (props) => {
 };
 
 Check.propTypes = {
-    t: PropTypes.func.isRequired,
     handleSubmit: PropTypes.func.isRequired,
     pristine: PropTypes.bool.isRequired,
     invalid: PropTypes.bool.isRequired,
     processing: PropTypes.bool.isRequired,
-    check: PropTypes.object.isRequired,
-    filters: PropTypes.array.isRequired,
-    whitelistFilters: PropTypes.array.isRequired,
 };
 
-export default flow([
-    withTranslation(),
-    reduxForm({ form: FORM_NAME.DOMAIN_CHECK }),
-])(Check);
+export default reduxForm({ form: FORM_NAME.DOMAIN_CHECK })(Check);
