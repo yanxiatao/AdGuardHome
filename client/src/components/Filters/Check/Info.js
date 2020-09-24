@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 
 import i18next from 'i18next';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import {
     checkFiltered,
     checkRewrite,
@@ -14,7 +14,32 @@ import {
     checkParental,
     getFilterName,
 } from '../../../helpers/helpers';
-import { FILTERED, FILTERED_STATUS } from '../../../helpers/constants';
+import { BLOCK_ACTIONS, FILTERED, FILTERED_STATUS } from '../../../helpers/constants';
+import { toggleBlocking } from '../../../actions';
+
+const renderBlockingButton = (isFiltered, domain) => {
+    const processingRules = useSelector((state) => state.filtering.processingRules);
+    const dispatch = useDispatch();
+    const { t } = useTranslation();
+
+    const buttonType = isFiltered ? BLOCK_ACTIONS.UNBLOCK : BLOCK_ACTIONS.BLOCK;
+
+    const onClick = async () => {
+        await dispatch(toggleBlocking(buttonType, domain));
+    };
+
+    const buttonClass = classNames('mt-3 button-action button-action--main button-action--active button-action--small', {
+        'button-action--unblock': isFiltered,
+    });
+
+    return <button type="button"
+                className={buttonClass}
+                onClick={onClick}
+                disabled={processingRules}
+        >
+            {t(buttonType)}
+        </button>;
+};
 
 const getTitle = (reason) => {
     const { t } = useTranslation();
@@ -66,7 +91,6 @@ const Info = () => {
         cname,
         ip_addrs,
     } = useSelector((state) => state.filtering.check, shallowEqual);
-
     const { t } = useTranslation();
 
     const title = getTitle(reason);
@@ -81,6 +105,8 @@ const Info = () => {
         || checkSafeBrowsing(reason)
         || checkParental(reason);
 
+    const isFiltered = checkFiltered(reason);
+
     return <div className={className}>
         <div><strong>{hostname}</strong></div>
         <div>{title}</div>
@@ -90,6 +116,7 @@ const Info = () => {
             {service_name && <div>{t('check_service', { service: service_name })}</div>}
             {cname && <div>{t('check_cname', { cname })}</div>}
             {ip_addrs && <div>{t('check_ip', { ip: ip_addrs.join(', ') })}</div>}
+            {renderBlockingButton(isFiltered, hostname)}
         </>}
     </div>;
 };
