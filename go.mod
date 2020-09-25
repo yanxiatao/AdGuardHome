@@ -31,4 +31,5 @@ require (
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gopkg.in/yaml.v2 v2.3.0
+	howett.net/plist v0.0.0-20200419221736-3b63eb3a43b5
 )

@@ -97,8 +97,10 @@ func registerControlHandlers() {
 	httpRegister(http.MethodGet, "/control/i18n/current_language", handleI18nCurrentLanguage)
 	http.HandleFunc("/control/version.json", postInstall(optionalAuth(handleGetVersionJSON)))
 	httpRegister(http.MethodPost, "/control/update", handleUpdate)
+	httpRegister(http.MethodGet, "/control/profile", handleGetProfile)
 
-	httpRegister("GET", "/control/profile", handleGetProfile)
+	httpRegister(http.MethodGet, "/apple/doh.mobileconfig", handleMobileConfigDoh)
+	httpRegister(http.MethodGet, "/apple/dot.mobileconfig", handleMobileConfigDot)
 	RegisterAuthHandlers()
 }
 

@@ -2,8 +2,14 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Trans, withTranslation } from 'react-i18next';
 
+import { useSelector } from 'react-redux';
 import Tabs from './Tabs';
 import Icons from './Icons';
+
+const MOBILE_CONFIG_LINKS = {
+    DOT: '/apple/dot.mobileconfig',
+    DOH: '/apple/doh.mobileconfig',
+};
 
 const dnsPrivacyList = [{
     title: 'Android',
@@ -143,6 +149,7 @@ const getTabs = ({
     tlsAddress,
     httpsAddress,
     showDnsPrivacyNotice,
+    encryptionEnabled,
     t,
 }) => ({
     Router: {
@@ -195,8 +202,8 @@ const getTabs = ({
     },
     dns_privacy: {
         title: 'dns_privacy',
-        // eslint-disable-next-line react/display-name
-        getTitle: () => <div label="dns_privacy" title={t('dns_privacy')}>
+        getTitle: function Title() {
+            return <div label="dns_privacy" title={t('dns_privacy')}>
             <div className="tab__text">
                 {tlsAddress?.length > 0 && (
                     <div className="tab__paragraph">
@@ -250,8 +257,17 @@ const getTabs = ({
                         </div>
                         {dnsPrivacyList.map(renderDnsPrivacyList)}
                     </>}
+                {encryptionEnabled && <>
+                    <Trans>download_mobileconfig</Trans>
+                    <ul>
+                        <li><a href={MOBILE_CONFIG_LINKS.DOT} download>{t('dns_over_tls')}</a></li>
+                        <li><a href={MOBILE_CONFIG_LINKS.DOH} download>{t('dns_over_https')}</a>
+                        </li>
+                    </ul>
+                </>}
             </div>
-        </div>,
+        </div>;
+        },
     },
 });
 
@@ -268,6 +284,7 @@ const renderContent = ({ title, list, getTitle }, t) => <div key={title} label={
 </div>;
 
 const Guide = ({ dnsAddresses, t }) => {
+    const encryptionEnabled = useSelector((state) => state.encryption.enabled);
     const tlsAddress = (dnsAddresses && dnsAddresses.filter((item) => item.includes('tls://'))) || '';
     const httpsAddress = (dnsAddresses && dnsAddresses.filter((item) => item.includes('https://'))) || '';
     const showDnsPrivacyNotice = httpsAddress.length < 1 && tlsAddress.length < 1;
@@ -278,6 +295,7 @@ const Guide = ({ dnsAddresses, t }) => {
         tlsAddress,
         httpsAddress,
         showDnsPrivacyNotice,
+        encryptionEnabled,
         t,
     });
 
